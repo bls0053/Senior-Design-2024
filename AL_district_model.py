@@ -52,8 +52,10 @@ while(inp != "Done"):
 
     for i, group in enumerate(features):
         for j, feat in enumerate(group):
+            if (inp.lower() == feat.name.lower()):
 
-            if (inp.casefold() == feat.name):
+                print("MATCH")
+
                 obj = features[i][j]
                 name = obj.name
                 data = obj.data
@@ -65,11 +67,11 @@ while(inp != "Done"):
                     inp = format(inp)
 
                     
-
+                    print(inp)
                     mask = data_init[name].isin(inp)
                     data_init = data_init[mask]
 
-                    print(data_init[1:20].to_string())
+                    print(data_init[1:400].to_string())
                     
 
                 else:
@@ -77,7 +79,7 @@ while(inp != "Done"):
                     inp = input("\nChoose percentage (value between 0-1): ")
                     data_init = data_init[data_init[name] >= float(inp)]
 
-                    print(data_init[1:20].to_string())
+                    print(data_init[1:400].to_string())
 
                 inp = ""
                     

@@ -83,24 +83,32 @@ class Feature_n:
 
 # Categorical variables
 cat_var = ['grade', 'year', 'leanm', 'Locale4', 'Locale3', 'BlackBeltSm', 'FoodDesert', 'CT_EconType']
-cat_str = ['leanm','Locale4','Locale3','CT_EconType']
+cat_str = ['leanm','Locale4','Locale3','CT_EconType', 'Locale4', 'Locale3']
 
 # Numerical variables, cannot select for more than 100% in subset
 num_var = ['perasn','perblk','perwht','perind','perhsp', 'perecd', 'perell']
 
 
 
-
+# Refactor - make single loop, reduce redundancy
 def init_df(df):
 
     for i, var in enumerate(cat_var):
         name = cat_var[i]
-        cat_var[i] = Feature_c(name, df[name].unique())
-    
+
+        data = np.array(df[name].unique())
+        data = remove_nan(data)
+
+        cat_var[i] = Feature_c(name, data)
+        
     for j, var in enumerate(num_var):
         name = num_var[j]
-        num_var[j] = Feature_n(name, df[name].unique())
 
+        data = np.array(df[name].unique())
+        
+        num_var[j] = Feature_n(name, data)
+
+    
     features = [cat_var, num_var]
     
     for k in cat_str:
@@ -118,16 +126,17 @@ def format(str):
     formatted_array = []
 
     for i in str:
-        if re.search(r'\d', i):
-            formatted_element = int(i)
+        if re.search(r'^[^a-zA-Z]+$', i):
+            formatted_element = int(i).strip()
         else:    
             formatted_element = i.lower()
-        formatted_array.append(formatted_element)    
+        formatted_array.append(formatted_element.strip())    
 
     return formatted_array
 
 
-
+def remove_nan(arr):
+     return np.array([item for item in arr if str(item).lower() != 'nan'])
 
 
 
