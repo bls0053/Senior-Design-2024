@@ -69,7 +69,7 @@ while(inp != "Done"):
                     mask = data_init[name].isin(inp)
                     data_init = data_init[mask]
 
-                    display(data_init)
+                    print(data_init[1:20].to_string())
                     
 
                 else:
@@ -77,7 +77,7 @@ while(inp != "Done"):
                     inp = input("\nChoose percentage (value between 0-1): ")
                     data_init = data_init[data_init[name] >= float(inp)]
 
-                    display(data_init)
+                    print(data_init[1:20].to_string())
 
                 inp = ""
                     
