@@ -38,7 +38,7 @@ data_subset, features = init_df(data_init)
 
 
 
-inp = input("Welcome Prof. Pendola, press any button to start\n")
+inp = input("Welcome Prof. Pendola, press Enter to start\n")
 
 
 ############################################################################### Subset Creation ###############################################################################
@@ -95,10 +95,18 @@ while(inp != "Done"):
 drop_nom(data_subset)
 mean_sub(data_subset)
 
+lasso_cv_metrics, lasso_cv_coefs = lasso_cv(data_subset)
+lp_metrics = lz_reg(data_subset)
+
+display(lasso_cv_metrics, "\n")
+display(lasso_cv_coefs, "\n")
+display(lp_metrics, "\n")
+prt_feat_data(features)
+print("\n")
 
 
-print(data_subset[1:1000].to_string())
 
+# print(data_subset[1:1000].to_string())
 # prt_feat_data(features)
 
 

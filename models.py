@@ -89,14 +89,15 @@ def lasso_cv(df):
     X_test = scaler.fit_transform(X_test)
     
     # Setup Lasso
-    lasso = Lasso(tol=.00035)
+    # lasso = Lasso(tol=.00035)
+    lasso = Lasso(tol=.0005)
     lasso.fit(X_train, y_train)
 
     # Lasso cross validation w/ tuning
     param_grid = {
         'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100]
     }
-    lasso_cv = GridSearchCV(lasso, param_grid, cv = 10, n_jobs = -1)
+    lasso_cv = GridSearchCV(lasso, param_grid, cv = 3, n_jobs = -1)
     lasso_cv.fit(X_train, y_train)
     y_pred2 = lasso_cv.predict(X_test)
     

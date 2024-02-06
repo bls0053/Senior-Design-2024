@@ -188,12 +188,12 @@ def mean_sub(df):
              df[column].fillna(mean, inplace=True)
 
 
-# Drop nan values
+# Drop nan values in groups
 def drop_gap(df):
     pass
 
 
-
+# Print current subset feature object data
 def prt_feat_data(features):
     for i, group in enumerate(features):
         for j, feat in enumerate(group):
