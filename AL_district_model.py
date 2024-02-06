@@ -14,7 +14,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import normalize
 
-from clean import preproc, init_df, format
+from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
 from models import lasso_cv, lz_reg
 import re
 
@@ -30,12 +30,18 @@ import re
 
 
 
-
+# Initializing dataframe and changeable features
 data_init = pd.read_csv('AL_Dist.csv')
+data_subset, features = init_df(data_init)
 
-data_init, features = init_df(data_init)
+
+
+
 
 inp = input("Welcome Prof. Pendola, press any button to start\n")
+
+
+############################################################################### Subset Creation ###############################################################################
 
 while(inp != "Done"):
 
@@ -63,24 +69,84 @@ while(inp != "Done"):
                     print("\nValues: ", data, "\n")
                     inp = input("Choose variables to include: ")
                     inp = format(inp)
+                    obj.data = inp
 
                     
                     print(inp)
-                    mask = data_init[name].isin(inp)
-                    data_init = data_init[mask]
+                    mask = data_subset[name].isin(inp)
+                    data_subset = data_subset[mask]
 
-                    print(data_init[1:400].to_string())
+                    print(data_subset[1:400].to_string())
                     
 
                 else:
                     
                     inp = input("\nChoose percentage (value between 0-1): ")
-                    data_init = data_init[data_init[name] >= float(inp)]
+                    obj.data = inp
 
-                    print(data_init[1:400].to_string())
+                    data_subset = data_subset[data_subset[name] >= float(inp)]
+
+                    print(data_subset[1:400].to_string())
 
                 inp = ""
                     
+############################################################################### Preprocessing/One-hot ###############################################################################
+
+drop_nom(data_subset)
+mean_sub(data_subset)
+
+
+
+print(data_subset[1:1000].to_string())
+
+# prt_feat_data(features)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# lasso_cv_metrics, lasso_cv_coefs =  lasso_cv(data_init)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Modules: gen_table() -> for misc metrics, list data, gen_barhplot() -> lazypredict results, lassocv coefs
+
+
+
 # Prompt user for model choice
 # Lasso, LassoCv, Lazypredict/lazyregressor, Lassocv with range of coefficients selected, lassocv with coefficients removed then run on new models 1 of 3-5
 # graph

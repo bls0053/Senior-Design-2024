@@ -64,34 +64,52 @@ def preproc(df):
 
     return df
 
-##########################################################################################################################################################################
+############################################################################### Dataframe Init ###############################################################################
 
-
-
-
-
+# Class object for categorical features
 class Feature_c:
     def __init__(self, name, data):
         self.name = name
         self.data = data
 
+# Class object for numerical features
 class Feature_n:
     def __init__(self, name, data):
         self.name = name
-        self.data = data
+        self.data = 0
 
 
 # Categorical variables
-cat_var = ['grade', 'year', 'leanm', 'Locale4', 'Locale3', 'BlackBeltSm', 'FoodDesert', 'CT_EconType']
-cat_str = ['leanm','Locale4','Locale3','CT_EconType', 'Locale4', 'Locale3']
+cat_var = ['grade', 'year', 'leanm', 'Locale4', 'BlackBeltSm', 'FoodDesert', 'CT_EconType']
+cat_str = ['leanm','Locale4','CT_EconType']
 
 # Numerical variables, cannot select for more than 100% in subset
 num_var = ['perasn','perblk','perwht','perind','perhsp', 'perecd', 'perell']
 
 
-
+# Initializes changeable features for subset creation
 # Refactor - make single loop, reduce redundancy
 def init_df(df):
+
+    # Always drop
+    # leaid - noise, achv - alternate predicted metric, Locale3 - alternate Locale4, math - 1 to 1 -> achvz, rla - 1 to 1 -> achvz
+    drop_cols = [
+        'leaid', 
+        'achv', 
+        'Locale3', 
+        'math', 
+        'rla'
+    ]
+
+    df.drop(columns=drop_cols, inplace=True)
+
+
+
+    # Drop columns if they are fully empty. Should be: LOCALE_VARS, DIST_FACTORS, HEALTH_FACTORS, COUNTY_FACTORS
+    for column in df.columns:
+        if ~df[column].notna().any():
+            df.drop(columns=column, inplace=True)
+
 
     for i, var in enumerate(cat_var):
         name = cat_var[i]
@@ -103,8 +121,6 @@ def init_df(df):
         
     for j, var in enumerate(num_var):
         name = num_var[j]
-
-        data = np.array(df[name].unique())
         
         num_var[j] = Feature_n(name, data)
 
@@ -120,7 +136,7 @@ def init_df(df):
     return df, features
 
 
-
+# Formats input - Removes whitespace, ignores case, converts type
 def format(str):
     str = str.split(',')
     formatted_array = []
@@ -135,96 +151,67 @@ def format(str):
     return formatted_array
 
 
+# Removes 'nan' values in feature data
 def remove_nan(arr):
      return np.array([item for item in arr if str(item).lower() != 'nan'])
 
 
 
 
+############################################################################### Cleaning ############################################################################### 
+
+# Two methods per issue
+    # Nominal values - Either drop them or encode them
+    # Empty values - Either drop them or populate them
+
+# One Hot encoding for categorical variables
+def bin_encode(df):
+    pass
+
+
+# Drop nominal values - Extremely sloppy, refactor in the future
+def drop_nom(df):
+    for column in df.columns:
+        if df[column].astype(str).str.contains(r'[0-9.-]', regex=True).any():
+            pass
+        else:
+            df.drop(columns=column, inplace=True)
+
+
+# Fill nan values
+def mean_sub(df):
+    for column in df.columns:
+
+        if df[column].isnull().any():
+             
+             mean = df[column].mean()
+             df[column].fillna(mean, inplace=True)
+
+
+# Drop nan values
+def drop_gap(df):
+    pass
+
+
+
+def prt_feat_data(features):
+    for i, group in enumerate(features):
+        for j, feat in enumerate(group):
+            name = feat.name
+            data = feat.data
+            print(f"Feature Name: {name}\tFeature Data: {data}\n")
 
 
 
 
 
-
-
-
-
-
-# feat_list = ['locale4', 'grade', ]
-
-# class Feature:
-#     name = ''
-#     data = []
-
-
-
-# def subset(df, feat, range):
-
-#     display(df)
-#     print("\n", feat, "\n", range)
-
-#     mask = df[feat].isin(range)
-#     df = df[mask]
-
-#     return df
-
-
-
-# def subset(df, feat, range):
-
-#     mask = df[feat].isin(range)
-#     df = df[mask]
-
-
-
-# Prompt user for Selection
-# 	County/City
-# 	Locale3/Locale4
-# 	Race
-# 	Grade
-# 	Econ Type
-# 	Custom?
-# 	Done
-#   Reset
-#       >Confirm
-#       >Back ---^
+# priorities when coming back, refactor pre-processing method - fill missing values: ALL? or minor?
+# remove big chunks before subset selection - static/init "drop_gaps()", "df_init()"
+# then mean substitution for remaining holes - after/dependent "mean_sub()"
+# Preproc() -> df_init(), ____Subset____, mean_sub() (and encoding), Models, graphs
+# encode
+# ct_econtype
+# Locale4
+# leanm
 #
-# 	For chosen 
-# 		Shows choices
-# 			Ex. 'grade'
-# 			Choose: "1, 2, 3, 4, 5, 6, 7, 8"
-# 				Select 1 or multiple (comma delimited?) -i - e
-# 				> 1,2,3
-#               > 8
-#               > confirm
-#               >Back ---^
-#   go back to selection
-#   remove options already chosen
-#
-# Prompt user for Selection
-# 	County/City
-# 	Locale3/Locale4
-# 	Race
-# 	Econ Type]
-# 	Custom?
-# 	Done
-#   Reset
-#       >Confirm
-#       >Back ---^
-#
-#   Etc
-#
-#   Subset() function takes in array, removes from dataframe all but input features
-#       ex. [1,2,3,4]
-#           remove 5,6,7,8
-#
-#   create feature object 
-#       - row vs col
-#       - range of acceptable values?
-
-
-
-
-
-
+# When only using 1 value of nominal value, can drop column, otherwise binary encode 
