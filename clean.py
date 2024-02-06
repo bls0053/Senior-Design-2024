@@ -126,11 +126,11 @@ def format(str):
     formatted_array = []
 
     for i in str:
-        if re.search(r'^[^a-zA-Z]+$', i):
-            formatted_element = int(i).strip()
+        if re.search(r'\d', i):
+            formatted_element = int(i)
         else:    
-            formatted_element = i.lower()
-        formatted_array.append(formatted_element.strip())    
+            formatted_element = i.lower().strip()
+        formatted_array.append(formatted_element)    
 
     return formatted_array
 

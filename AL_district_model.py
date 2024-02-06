@@ -54,8 +54,6 @@ while(inp != "Done"):
         for j, feat in enumerate(group):
             if (inp.lower() == feat.name.lower()):
 
-                print("MATCH")
-
                 obj = features[i][j]
                 name = obj.name
                 data = obj.data
@@ -83,11 +81,31 @@ while(inp != "Done"):
 
                 inp = ""
                     
-
-
-
-
-
+# Prompt user for model choice
+# Lasso, LassoCv, Lazypredict/lazyregressor, Lassocv with range of coefficients selected, lassocv with coefficients removed then run on new models 1 of 3-5
+# graph
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#                
+#
+#
+#
+#
+#
+#
+#
+#                
+#
+#
+#
+#                
 # data_clean = preproc(data_init)
 # df_ut, df_t, df_t_coef = lasso_cv(data_clean)
 # reg_models = lz_reg(data_clean)
