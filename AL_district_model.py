@@ -15,35 +15,37 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import normalize
 
 from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
-from models import lasso_cv, lz_reg
+from models import lasso_cv, lz_reg, reduce_coef, get_models
 import re
 
 
 
 ##################################################################################################################
 
-# data_init -> Starting dataset, contains missing values and categorical data
-# data_clean -> Data after preprocessing, missing values removed or filled with column mean, categorical removed
-# df_ut -> Lasso on un-tuned parameters
-# df_t -> Lasso with parameter tuning
-# df_t_coef -> Sorted list of parameter tuned Lasso coefficients
-
+# data_init -> Starting dataset (df)
+# data_subset -> Chosen data subset (df)
+# features -> List of Feature objects ([][])
+# lasso_metrics -> results from lasso (df)
+# lasso_coef -> coefs from lasso (df)
+# lasso_coef_red -> coefs reduced down (df)
+# lzp_metrics ->
 
 
 # Initializing dataframe and changeable features
 data_init = pd.read_csv('AL_Dist.csv')
 data_subset, features = init_df(data_init)
 
-
-
-
+############################################################################### Subset Creation ###############################################################################
+# Make 'done' case-insensitive
+# Add reset option
+# Warning for the dataset becoming too small upon making a choice
+#   or: give an option to revert choice
+# If mispelled print "not a viable option, try again"
+#
 
 inp = input("Welcome Prof. Pendola, press Enter to start\n")
 
-
-############################################################################### Subset Creation ###############################################################################
-
-while(inp != "Done"):
+while(inp != "Done"): 
 
     for i, group in enumerate(features):
         if (i==0):
@@ -91,18 +93,34 @@ while(inp != "Done"):
                 inp = ""
                     
 ############################################################################### Preprocessing/One-hot ###############################################################################
+# Tune lasso parameters proportionally to dataset size***
+# Prompt user input for what they want to see               
+# Integrate graphs
+# Optional choice for user to hard-change params
+#                
+
+
 
 drop_nom(data_subset)
 mean_sub(data_subset)
 
-lasso_cv_metrics, lasso_cv_coefs = lasso_cv(data_subset)
-lp_metrics = lz_reg(data_subset)
 
-display(lasso_cv_metrics, "\n")
-display(lasso_cv_coefs, "\n")
-display(lp_metrics, "\n")
+lasso_metrics, lasso_coef = lasso_cv(data_subset)
+lasso_coef_red = reduce_coef(lasso_coef)
+lzp_metrics = lz_reg(data_subset)
+new_models = get_models(lzp_metrics)
+
+
+
+display(data_init, "\n")
+display(data_subset, "\n")
+display(lasso_metrics, "\n")
+display(lasso_coef, "\n")
+display(lasso_coef_red, "\n")
+display(lzp_metrics, "\n")
+display(new_models, "\n")
 prt_feat_data(features)
-print("\n")
+# print("\n")
 
 
 

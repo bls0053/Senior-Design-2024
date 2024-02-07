@@ -91,6 +91,8 @@ num_var = ['perasn','perblk','perwht','perind','perhsp', 'perecd', 'perell']
 # Refactor - make single loop, reduce redundancy
 def init_df(df):
 
+    temp_df = df.copy()
+
     # Always drop
     # leaid - noise, achv - alternate predicted metric, Locale3 - alternate Locale4, math - 1 to 1 -> achvz, rla - 1 to 1 -> achvz
     drop_cols = [
@@ -101,20 +103,20 @@ def init_df(df):
         'rla'
     ]
 
-    df.drop(columns=drop_cols, inplace=True)
+    temp_df.drop(columns=drop_cols, inplace=True)
 
 
 
     # Drop columns if they are fully empty. Should be: LOCALE_VARS, DIST_FACTORS, HEALTH_FACTORS, COUNTY_FACTORS
-    for column in df.columns:
-        if ~df[column].notna().any():
-            df.drop(columns=column, inplace=True)
+    for column in temp_df.columns:
+        if ~temp_df[column].notna().any():
+            temp_df.drop(columns=column, inplace=True)
 
 
     for i, var in enumerate(cat_var):
         name = cat_var[i]
 
-        data = np.array(df[name].unique())
+        data = np.array(temp_df[name].unique())
         data = remove_nan(data)
 
         cat_var[i] = Feature_c(name, data)
@@ -128,12 +130,12 @@ def init_df(df):
     features = [cat_var, num_var]
     
     for k in cat_str:
-        df[k] = df[k].str.lower()
+        temp_df[k] = temp_df[k].str.lower()
 
     
-    display(df)
+    display(temp_df)
 
-    return df, features
+    return temp_df, features
 
 
 # Formats input - Removes whitespace, ignores case, converts type
@@ -164,9 +166,10 @@ def remove_nan(arr):
     # Nominal values - Either drop them or encode them
     # Empty values - Either drop them or populate them
 
-# One Hot encoding for categorical variables
+# Binary encoding for categorical variables
 def bin_encode(df):
     pass
+
 
 
 # Drop nominal values - Extremely sloppy, refactor in the future
@@ -175,7 +178,7 @@ def drop_nom(df):
         if df[column].astype(str).str.contains(r'[0-9.-]', regex=True).any():
             pass
         else:
-            df.drop(columns=column, inplace=True)
+            pass
 
 
 # Fill nan values
@@ -184,11 +187,11 @@ def mean_sub(df):
 
         if df[column].isnull().any():
              
-             mean = df[column].mean()
-             df[column].fillna(mean, inplace=True)
+            mean = df[column].mean()
+            df[column].fillna(mean, inplace=True)
 
 
-# Drop nan values in groups
+# Drop nan values in groups, hinge on specified/default parameter
 def drop_gap(df):
     pass
 
@@ -213,5 +216,14 @@ def prt_feat_data(features):
 # ct_econtype
 # Locale4
 # leanm
+#
+# New prios: 
+# encode nominals
+# drop gappy?
+# Integrate graphing / refactor graphing
+#
+#
+#
+#
 #
 # When only using 1 value of nominal value, can drop column, otherwise binary encode 

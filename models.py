@@ -90,12 +90,13 @@ def lasso_cv(df):
     
     # Setup Lasso
     # lasso = Lasso(tol=.00035)
-    lasso = Lasso(tol=.0005)
+    lasso = Lasso()
     lasso.fit(X_train, y_train)
 
     # Lasso cross validation w/ tuning
     param_grid = {
-        'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100]
+        'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+        'tol' : [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     }
     lasso_cv = GridSearchCV(lasso, param_grid, cv = 3, n_jobs = -1)
     lasso_cv.fit(X_train, y_train)
@@ -112,25 +113,18 @@ def lasso_cv(df):
     feature_names = df.columns.tolist()
     feature_names.remove('achvz')
 
-    df_t_coef = pd.DataFrame({'Features': feature_names,
-                              'Coefficients': lasso2.coef_})
+    # df_t_coef = pd.DataFrame({'Features': feature_names,
+    #                           'Coefficients': lasso2.coef_})
+    df_t_coef = pd.DataFrame(lasso2.coef_, columns =['Coefficients'], index=feature_names)
 
     # df_t_coef_sorted = df_t_coef.sort_values(by='Coefficients', ascending=False)
     df_t_coef_sorted = df_t_coef.iloc[np.argsort(np.abs(df_t_coef['Coefficients']))]
-
+    
     return df_t, df_t_coef_sorted
 
 
+# Runs lazypredict on user-made dataframe. Returns dataframe populated with results
 def lz_reg(df):
-
-    # regressors = [
-    #     'ExtraTreesRegressor','LGBMRegressor','HistGradientBoostingRegressor','RandomForestRegressor','NuSVR','SVR','MLPRegressor',
-    #     'KNeighborsRegressor','XGBRegressor','BaggingRegressor','GradientBoostingRegressor','AdaBoostRegressor','KernelRidge',
-    #     'Ridge','RidgeCV','TransformedTargetRegressor','LinearRegression','BayesianRidge','LassoLarsCV','ElasticNetCV','LassoCV',
-    #     'HuberRegressor','LassoLarsIC','SGDRegressor','LinearSVR','GaussianProcessRegressor','ExtraTreeRegressor','OrthogonalMatchingPursuitCV',
-    #     'OrthogonalMatchingPursuit','LarsCV','TweedieRegressor','DecisionTreeRegressor','PassiveAggressiveRegressor','ElasticNet',
-    #     'DummyRegressor','Lasso','LassoLars','RANSACRegressor'
-    # ]
 
     # Set target and data
     X = df.drop('achvz', axis=1)
@@ -144,3 +138,23 @@ def lz_reg(df):
     reg_models, reg_predictions = reg.fit(X_train, X_test, y_train, y_test)
 
     return reg_models
+
+
+# 
+def get_models(df, amount = 3):
+
+    temp_df = df.copy()
+    temp_df = temp_df[0:amount]
+
+    return temp_df
+
+#
+def reduce_coef(df, reduc = .05):
+
+    temp_df = df.copy()
+
+    for row in temp_df.index:
+        if np.abs(temp_df.loc[row,'Coefficients']) < reduc:
+            temp_df.drop(index=row, inplace=True)
+
+    return temp_df
