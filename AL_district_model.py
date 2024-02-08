@@ -15,8 +15,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import normalize
 
 from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
-from models import lasso_cv, lz_reg, reduce_coef, get_models
+from models import lasso_cv, lz_reg, get_models, reduce_subset, ext_trees
 import re
+
 
 
 
@@ -34,6 +35,8 @@ import re
 # Initializing dataframe and changeable features
 data_init = pd.read_csv('AL_Dist.csv')
 data_subset, features = init_df(data_init)
+
+
 
 ############################################################################### Subset Creation ###############################################################################
 # Make 'done' case-insensitive
@@ -78,7 +81,8 @@ while(inp != "Done"):
                     mask = data_subset[name].isin(inp)
                     data_subset = data_subset[mask]
 
-                    print(data_subset[1:400].to_string())
+                    # print(data_subset[1:400].to_string())
+                    display(data_subset)
                     
 
                 else:
@@ -88,7 +92,8 @@ while(inp != "Done"):
 
                     data_subset = data_subset[data_subset[name] >= float(inp)]
 
-                    print(data_subset[1:400].to_string())
+                    # print(data_subset[1:400].to_string())
+                    display(data_subset)
 
                 inp = ""
                     
@@ -106,32 +111,35 @@ mean_sub(data_subset)
 
 
 lasso_metrics, lasso_coef = lasso_cv(data_subset)
-lasso_coef_red = reduce_coef(lasso_coef)
-lzp_metrics = lz_reg(data_subset)
-new_models = get_models(lzp_metrics)
+
+subset_red, coef_red = reduce_subset(data_subset, lasso_coef)
+
+
+# lzp_metrics = lz_reg(data_subset)
+# new_models = get_models(lzp_metrics)
+
+
+tree_df = ext_trees(subset_red)
+display(tree_df)
+
+# display(data_init, "\n")
+# display(data_subset, "\n")
+# display(lasso_metrics, "\n")
+# display(lasso_coef, "\n")
+# display(coef_red, "\n")
+# display(subset_red, "\n")
+# display(lzp_metrics, "\n")
+# display(new_models, "\n")
+
+# prt_feat_data(features, "\n")
 
 
 
-display(data_init, "\n")
-display(data_subset, "\n")
-display(lasso_metrics, "\n")
-display(lasso_coef, "\n")
-display(lasso_coef_red, "\n")
-display(lzp_metrics, "\n")
-display(new_models, "\n")
-prt_feat_data(features)
-# print("\n")
-
-
-
-# print(data_subset[1:1000].to_string())
-# prt_feat_data(features)
 
 
 
 
-
-
+# run trees without lasso, then run trees with
 
 
 

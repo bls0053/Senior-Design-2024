@@ -178,7 +178,7 @@ def drop_nom(df):
         if df[column].astype(str).str.contains(r'[0-9.-]', regex=True).any():
             pass
         else:
-            pass
+            df.drop(columns=column, inplace=True)
 
 
 # Fill nan values

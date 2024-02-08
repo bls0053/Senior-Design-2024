@@ -13,8 +13,12 @@ from sklearn.linear_model import Lasso
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import normalize
+from sklearn.utils._testing import ignore_warnings
 
-
+from sklearn.model_selection import cross_val_score, RepeatedKFold
+from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor
+from sklearn.svm import NuSVR, SVR
+import lightgbm as ltb
 
 # def lasso_cv(df):
 
@@ -73,7 +77,6 @@ from sklearn.preprocessing import normalize
     
 #     return df_ut, df_t, df_t_coef_sorted
 
-
 def lasso_cv(df):
 
     # Set target and data
@@ -89,7 +92,6 @@ def lasso_cv(df):
     X_test = scaler.fit_transform(X_test)
     
     # Setup Lasso
-    # lasso = Lasso(tol=.00035)
     lasso = Lasso()
     lasso.fit(X_train, y_train)
 
@@ -98,7 +100,7 @@ def lasso_cv(df):
         'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
         'tol' : [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     }
-    lasso_cv = GridSearchCV(lasso, param_grid, cv = 3, n_jobs = -1)
+    lasso_cv = GridSearchCV(lasso, param_grid, cv = 5, n_jobs = -1)
     lasso_cv.fit(X_train, y_train)
     y_pred2 = lasso_cv.predict(X_test)
     
@@ -149,12 +151,92 @@ def get_models(df, amount = 3):
     return temp_df
 
 #
-def reduce_coef(df, reduc = .05):
+# def reduce_coef(df, reduc = .05):
 
-    temp_df = df.copy()
+#     temp_df = df.copy()
 
-    for row in temp_df.index:
-        if np.abs(temp_df.loc[row,'Coefficients']) < reduc:
-            temp_df.drop(index=row, inplace=True)
+#     for row in temp_df.index:
+#         if np.abs(temp_df.loc[row,'Coefficients']) < reduc:
+#             temp_df.drop(index=row, inplace=True)
 
-    return temp_df
+#     return temp_df
+
+# 
+def reduce_subset(df_sub, df_coef, reduc = .05):
+
+    temp_sub = df_sub.copy()
+    temp_coef = df_coef.copy()
+
+    for row in df_coef.index:
+        if np.abs(df_coef.loc[row,'Coefficients']) < reduc:
+            temp_sub.drop(columns=row, inplace=True)
+            temp_coef.drop(index=row, inplace=True)
+
+    return temp_sub, temp_coef
+
+
+
+
+# 
+def ext_trees(df):
+    
+    # Get target and data
+    X = df.drop('achvz', axis=1)
+    y = df['achvz']
+
+    # 80/20 test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    
+    # Scale data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+
+    # Fit model
+    tree = ExtraTreesRegressor(n_estimators=1000)
+    tree.fit(X_train, y_train)
+
+        # Tune params - Way Way Way too heavy on execution time
+    # param_grid = {
+    #     'n_estimators' : [250, 500, 1000],
+    #     'max_depth' : [None, 10, 20, 30]
+    # }
+
+    # tree_t = GridSearchCV(tree, param_grid, cv = 5, n_jobs = -1)
+    # tree_t.fit(X_train, y_train)
+    # print(tree_t.best_estimator_)
+    # tree2 = tree_t.best_estimator_
+    
+
+    # Cross-val
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    n_scores = cross_val_score(tree, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+
+    print('MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
+
+    # Sort data
+    feature_names = df.columns.tolist()
+    feature_names.remove('achvz')
+    tree_coef = pd.DataFrame(tree.feature_importances_, columns =['Coefficients'], index=feature_names)
+    tree_coef = tree_coef.iloc[np.argsort(np.abs(tree_coef['Coefficients']))]
+
+    return tree_coef
+
+
+
+# 
+def grad_boost():
+    pass
+
+# 
+def svr():
+    pass
+
+# 
+def lgbm():
+    pass
+
+# 
+def nu_svr():
+    pass
+
