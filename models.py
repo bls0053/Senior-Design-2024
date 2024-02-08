@@ -95,9 +95,9 @@ def lasso_cv(df):
     lasso = Lasso()
     lasso.fit(X_train, y_train)
 
-    # Lasso cross validation w/ tuning
+    # Lasso cross validation w/ tuning 0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 
     param_grid = {
-        'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+        'alpha' : [0.1, 1, 10, 100],
         'tol' : [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     }
     lasso_cv = GridSearchCV(lasso, param_grid, cv = 5, n_jobs = -1)
@@ -138,6 +138,8 @@ def lz_reg(df):
 
     reg = LazyRegressor(verbose=0, ignore_warnings=False, custom_metric=None)
     reg_models, reg_predictions = reg.fit(X_train, X_test, y_train, y_test)
+    reg_models = reg_models.sort_values(by='RMSE', ascending=True)
+
 
     return reg_models
 
@@ -193,8 +195,8 @@ def ext_trees(df):
     X_test = scaler.fit_transform(X_test)
 
     # Fit model
-    tree = ExtraTreesRegressor(n_estimators=1000)
-    tree.fit(X_train, y_train)
+    regressor = ExtraTreesRegressor(n_estimators=200)
+    regressor.fit(X_train, y_train)
 
         # Tune params - Way Way Way too heavy on execution time
     # param_grid = {
@@ -202,41 +204,112 @@ def ext_trees(df):
     #     'max_depth' : [None, 10, 20, 30]
     # }
 
-    # tree_t = GridSearchCV(tree, param_grid, cv = 5, n_jobs = -1)
-    # tree_t.fit(X_train, y_train)
-    # print(tree_t.best_estimator_)
-    # tree2 = tree_t.best_estimator_
+    # regressor_t = GridSearchCV(regressor, param_grid, cv = 5, n_jobs = -1)
+    # regressor_t.fit(X_train, y_train)
+    # print(regressor_t.best_estimator_)
+    # regressor2 = regressor_t.best_estimator_
     
 
     # Cross-val
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
-    n_scores = cross_val_score(tree, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+    n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 
-    print('MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
-
-    # Sort data
-    feature_names = df.columns.tolist()
-    feature_names.remove('achvz')
-    tree_coef = pd.DataFrame(tree.feature_importances_, columns =['Coefficients'], index=feature_names)
-    tree_coef = tree_coef.iloc[np.argsort(np.abs(tree_coef['Coefficients']))]
-
-    return tree_coef
-
-
+    print('ExtraTreesRegressor MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
 
 # 
-def grad_boost():
-    pass
+def grad_boost(df):
+     
+    # Get target and data
+    X = df.drop('achvz', axis=1)
+    y = df['achvz']
+
+    # 80/20 test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    
+    # Scale data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+
+    # Fit model
+    regressor = HistGradientBoostingRegressor()
+    regressor.fit(X_train, y_train)
+
+    # Cross-val
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+
+    print('HistGradientBoosting MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
 # 
-def svr():
-    pass
+def svr(df):
+    # Get target and data
+    X = df.drop('achvz', axis=1)
+    y = df['achvz']
+
+    # 80/20 test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    
+    # Scale data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+
+    # Fit model
+    regressor = SVR()
+    regressor.fit(X_train, y_train)
+
+    # Cross-val
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+
+    print('SVR MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
 # 
-def lgbm():
-    pass
+def lgbm(df):
+    # Get target and data
+    X = df.drop('achvz', axis=1)
+    y = df['achvz']
+
+    # 80/20 test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    
+    # Scale data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+
+    # Fit model
+    regressor = ltb.LGBMRegressor()
+    regressor.fit(X_train, y_train)
+
+    # Cross-val
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+
+    print('LGBM MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
 # 
-def nu_svr():
-    pass
+def nu_svr(df):
+    # Get target and data
+    X = df.drop('achvz', axis=1)
+    y = df['achvz']
+
+    # 80/20 test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    
+    # Scale data
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+
+    # Fit model
+    regressor = NuSVR()
+    regressor.fit(X_train, y_train)
+
+    # Cross-val
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
+
+    print('NuSVR MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 

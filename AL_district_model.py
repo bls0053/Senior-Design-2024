@@ -15,7 +15,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import normalize
 
 from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
-from models import lasso_cv, lz_reg, get_models, reduce_subset, ext_trees
+import models
 import re
 
 
@@ -110,32 +110,40 @@ drop_nom(data_subset)
 mean_sub(data_subset)
 
 
-lasso_metrics, lasso_coef = lasso_cv(data_subset)
+lasso_metrics, lasso_coef = models.lasso_cv(data_subset)
 
-subset_red, coef_red = reduce_subset(data_subset, lasso_coef)
-
-
-# lzp_metrics = lz_reg(data_subset)
-# new_models = get_models(lzp_metrics)
+subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.001)
 
 
-tree_df = ext_trees(subset_red)
-display(tree_df)
+lzp_metrics = models.lz_reg(data_subset)
+new_models = models.get_models(lzp_metrics)
 
-# display(data_init, "\n")
-# display(data_subset, "\n")
-# display(lasso_metrics, "\n")
-# display(lasso_coef, "\n")
-# display(coef_red, "\n")
-# display(subset_red, "\n")
-# display(lzp_metrics, "\n")
-# display(new_models, "\n")
-
-# prt_feat_data(features, "\n")
+# models.ext_trees(data_subset)
+# models.grad_boost(data_subset)
 
 
+display(data_init, "\n")
+display(data_subset, "\n")
 
 
+display(lasso_metrics, "\n")
+display(lasso_coef, "\n")
+display(coef_red, "\n")
+display(subset_red, "\n")
+
+display(lzp_metrics, "\n")
+display(new_models, "\n")
+
+prt_feat_data(features)
+
+
+
+print("\n")
+models.ext_trees(subset_red)
+models.grad_boost(subset_red)
+models.nu_svr(subset_red)
+models.svr(subset_red)
+# models.lgbm(subset_red)
 
 
 
