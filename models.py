@@ -1,13 +1,11 @@
-import lazypredict
+
+# Imports
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from lazypredict.Supervised import LazyClassifier, LazyRegressor
+from lazypredict.Supervised import LazyRegressor
 from sklearn.model_selection import train_test_split
 from IPython.display import display
 import numpy as np
 
-# from sklearn.datasets import fetch_california_housing
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import Lasso
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -20,62 +18,12 @@ from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor
 from sklearn.svm import NuSVR, SVR
 import lightgbm as ltb
 
-# def lasso_cv(df):
 
-#     # Set target and data
-#     X = df.drop('achvz', axis=1)
-#     y = df['achvz']
-#     normalize(X)
 
-#     # train_test_split: test=.2, train=.8
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
-
-    
-#     # Standardize data
-#     scaler = StandardScaler()
-#     X_train = scaler.fit_transform(X_train)
-#     X_test = scaler.fit_transform(X_test)
-    
-#     # Run Lasso on un-tuned parameters
-    
-#     lasso = Lasso(tol=.00035)
-#     lasso.fit(X_train, y_train)
-#     y_pred = lasso.predict(X_test)
-    
-#     # Results
-#     df_ut = pd.DataFrame(columns=["Mean Absolute Error", "Mean Squared Error", "R2 Score"])
-#     values = [mean_absolute_error(y_test, y_pred), mean_squared_error(y_test, y_pred), r2_score(y_test, y_pred)]
-#     df_ut.loc[0] = values
-    
-
-#     # Lasso cross validation w/ tuning
-#     param_grid = {
-#         'alpha' : [0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100]
-#     }
-#     lasso_cv = GridSearchCV(lasso, param_grid, cv = 3, n_jobs = -1)
-#     lasso_cv.fit(X_train, y_train)
-#     y_pred2 = lasso_cv.predict(X_test)
-    
-
-#     # Results
-#     lasso2 = lasso_cv.best_estimator_
-#     lasso2.fit(X_train, y_train)
-
-#     df_t = pd.DataFrame(columns = ["Mean absolute Error", "Mean Squared Error", "R2 Score", "Lasso Vars"])
-#     values = [mean_absolute_error(y_test, y_pred2), mean_squared_error(y_test, y_pred2), r2_score(y_test, y_pred2), lasso_cv.best_estimator_]
-#     df_t.loc[0] = values
-
-#     feature_names = df.columns.tolist()
-#     feature_names.remove('achvz')
-
-#     df_t_coef = pd.DataFrame({'Features': feature_names,
-#                               'Coefficients': lasso2.coef_})
-    
-
-#     df_t_coef_sorted = df_t_coef.sort_values(by='Coefficients', ascending=False)
-#     df_t_coef_sorted = df_t_coef.iloc[np.argsort(np.abs(df_t_coef['Coefficients']))]
-    
-#     return df_ut, df_t, df_t_coef_sorted
+# Lasso
+    # 0.2/0.8 split (test=.2)
+    # Gridsearch tunes param (alpha, tol), alpha may be hardset in future
+    # Returns feature coefficient strengths and other Lasso performance metrics
 
 def lasso_cv(df):
 
@@ -95,9 +43,9 @@ def lasso_cv(df):
     lasso = Lasso()
     lasso.fit(X_train, y_train)
 
-    # Lasso cross validation w/ tuning 0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 
+    # Lasso cross validation w/ tuning 
     param_grid = {
-        'alpha' : [0.1, 1, 10, 100],
+        'alpha' : [0.01, 0.1, 1, 10, 100],
         'tol' : [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     }
     lasso_cv = GridSearchCV(lasso, param_grid, cv = 5, n_jobs = -1)
@@ -115,17 +63,13 @@ def lasso_cv(df):
     feature_names = df.columns.tolist()
     feature_names.remove('achvz')
 
-    # df_t_coef = pd.DataFrame({'Features': feature_names,
-    #                           'Coefficients': lasso2.coef_})
     df_t_coef = pd.DataFrame(lasso2.coef_, columns =['Coefficients'], index=feature_names)
-
-    # df_t_coef_sorted = df_t_coef.sort_values(by='Coefficients', ascending=False)
     df_t_coef_sorted = df_t_coef.iloc[np.argsort(np.abs(df_t_coef['Coefficients']))]
     
     return df_t, df_t_coef_sorted
 
 
-# Runs lazypredict on user-made dataframe. Returns dataframe populated with results
+# Runs lazypredict on user-made dataframe. Returns dataframe populated with model performance results
 def lz_reg(df):
 
     # Set target and data
@@ -144,7 +88,7 @@ def lz_reg(df):
     return reg_models
 
 
-# 
+# Returns the top n performing models
 def get_models(df, amount = 3):
 
     temp_df = df.copy()
@@ -152,18 +96,23 @@ def get_models(df, amount = 3):
 
     return temp_df
 
-#
-# def reduce_coef(df, reduc = .05):
 
-#     temp_df = df.copy()
+# Remove in future potentially. Same as reduce_subset but only reduces coefficient dataframe
 
-#     for row in temp_df.index:
-#         if np.abs(temp_df.loc[row,'Coefficients']) < reduc:
-#             temp_df.drop(index=row, inplace=True)
+    # def reduce_coef(df, reduc = .05):
 
-#     return temp_df
+    #     temp_df = df.copy()
 
-# 
+    #     for row in temp_df.index:
+    #         if np.abs(temp_df.loc[row,'Coefficients']) < reduc:
+    #             temp_df.drop(index=row, inplace=True)
+
+    #     return temp_df
+
+
+
+
+# Reduces subset and coefficients based on specified amount of regularization of coefficients
 def reduce_subset(df_sub, df_coef, reduc = .05):
 
     temp_sub = df_sub.copy()
@@ -179,7 +128,7 @@ def reduce_subset(df_sub, df_coef, reduc = .05):
 
 
 
-# 
+# Simple implementation for ExtraTreesRegressor
 def ext_trees(df):
     
     # Get target and data
@@ -198,16 +147,18 @@ def ext_trees(df):
     regressor = ExtraTreesRegressor(n_estimators=200)
     regressor.fit(X_train, y_train)
 
-        # Tune params - Way Way Way too heavy on execution time
-    # param_grid = {
-    #     'n_estimators' : [250, 500, 1000],
-    #     'max_depth' : [None, 10, 20, 30]
-    # }
+        
+    # Tune params - Way Way Way too heavy on execution time
+    
+        # param_grid = {
+        #     'n_estimators' : [250, 500, 1000],
+        #     'max_depth' : [None, 10, 20, 30]
+        # }
 
-    # regressor_t = GridSearchCV(regressor, param_grid, cv = 5, n_jobs = -1)
-    # regressor_t.fit(X_train, y_train)
-    # print(regressor_t.best_estimator_)
-    # regressor2 = regressor_t.best_estimator_
+        # regressor_t = GridSearchCV(regressor, param_grid, cv = 5, n_jobs = -1)
+        # regressor_t.fit(X_train, y_train)
+        # print(regressor_t.best_estimator_)
+        # regressor2 = regressor_t.best_estimator_
     
 
     # Cross-val
@@ -216,7 +167,8 @@ def ext_trees(df):
 
     print('ExtraTreesRegressor MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
 
-# 
+
+# Simple implementation for HistGradientBoostingRegressor
 def grad_boost(df):
      
     # Get target and data
@@ -241,7 +193,8 @@ def grad_boost(df):
 
     print('HistGradientBoosting MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
-# 
+
+# Simple implementation for SVR
 def svr(df):
     # Get target and data
     X = df.drop('achvz', axis=1)
@@ -265,7 +218,8 @@ def svr(df):
 
     print('SVR MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
-# 
+
+# Simple implementation for LGBMRegressor. DOES NOT WORK
 def lgbm(df):
     # Get target and data
     X = df.drop('achvz', axis=1)
@@ -289,7 +243,8 @@ def lgbm(df):
 
     print('LGBM MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
-# 
+
+# Simple implementation for NuSVR
 def nu_svr(df):
     # Get target and data
     X = df.drop('achvz', axis=1)

@@ -1,22 +1,12 @@
 
-import lazypredict
+
+
+# Imports
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from lazypredict.Supervised import LazyClassifier, LazyRegressor
-from sklearn.model_selection import train_test_split
 from IPython.display import display
-import numpy as np
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Lasso
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import normalize
-
-from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
+from clean import init_df, format, prt_feat_data, drop_nom, mean_sub
 import models
-import re
 
 
 
@@ -29,7 +19,7 @@ import re
 # lasso_metrics -> results from lasso (df)
 # lasso_coef -> coefs from lasso (df)
 # lasso_coef_red -> coefs reduced down (df)
-# lzp_metrics ->
+# lzp_metrics -> 
 
 
 # Initializing dataframe and changeable features
@@ -39,12 +29,14 @@ data_subset, features = init_df(data_init)
 
 
 ############################################################################### Subset Creation ###############################################################################
-# Make 'done' case-insensitive
-# Add reset option
-# Warning for the dataset becoming too small upon making a choice
-#   or: give an option to revert choice
-# If mispelled print "not a viable option, try again"
 #
+# Need to add:
+    # Make 'done' case-insensitive
+    # Add reset option
+    # Warning for the dataset becoming too small upon making a choice
+    #   or: give an option to revert choice
+    # If mispelled print "not a viable option, try again"
+    #
 
 inp = input("Welcome Prof. Pendola, press Enter to start\n")
 
@@ -96,13 +88,15 @@ while(inp != "Done"):
                     display(data_subset)
 
                 inp = ""
-                    
+
 ############################################################################### Preprocessing/One-hot ###############################################################################
-# Tune lasso parameters proportionally to dataset size***
-# Prompt user input for what they want to see               
-# Integrate graphs
-# Optional choice for user to hard-change params
-#                
+#
+# Need to add?:                
+    # Tune lasso parameters proportionally to dataset size***
+    # Prompt user input for what they want to see               
+    # Integrate graphs
+    # Optional choice for user to hard-change params
+    # 
 
 
 
@@ -117,9 +111,6 @@ subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.001)
 
 lzp_metrics = models.lz_reg(data_subset)
 new_models = models.get_models(lzp_metrics)
-
-# models.ext_trees(data_subset)
-# models.grad_boost(data_subset)
 
 
 display(data_init, "\n")
@@ -143,11 +134,6 @@ models.ext_trees(subset_red)
 models.grad_boost(subset_red)
 models.nu_svr(subset_red)
 models.svr(subset_red)
-# models.lgbm(subset_red)
-
-
-
-# run trees without lasso, then run trees with
 
 
 
@@ -164,59 +150,6 @@ models.svr(subset_red)
 
 
 
-
-
-
-
-
-
-
-# lasso_cv_metrics, lasso_cv_coefs =  lasso_cv(data_init)
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Modules: gen_table() -> for misc metrics, list data, gen_barhplot() -> lazypredict results, lassocv coefs
-
-
-
-# Prompt user for model choice
-# Lasso, LassoCv, Lazypredict/lazyregressor, Lassocv with range of coefficients selected, lassocv with coefficients removed then run on new models 1 of 3-5
-# graph
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#                
-#
-#
-#
-#
-#
-#
-#
-#                
-#
-#
-#
-#                
-# data_clean = preproc(data_init)
-# df_ut, df_t, df_t_coef = lasso_cv(data_clean)
-# reg_models = lz_reg(data_clean)
 
 
 
