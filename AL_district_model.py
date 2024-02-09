@@ -1,33 +1,25 @@
 
-import lazypredict
+
+
+# Imports
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from lazypredict.Supervised import LazyClassifier, LazyRegressor
-from sklearn.model_selection import train_test_split
 from IPython.display import display
-import numpy as np
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Lasso
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import normalize
-
-from clean import preproc, init_df, format, bin_encode, prt_feat_data, drop_nom, mean_sub
-from models import lasso_cv, lz_reg
-import re
+from clean import init_df, format, prt_feat_data, drop_nom, mean_sub
+import models
 
 
-#######
+
+
 ##################################################################################################################
 
-# data_init -> Starting dataset, contains missing values and categorical data
-# data_clean -> Data after preprocessing, missing values removed or filled with column mean, categorical removed
-# df_ut -> Lasso on un-tuned parameters
-# df_t -> Lasso with parameter tuning
-# df_t_coef -> Sorted list of parameter tuned Lasso coefficients
-
+# data_init -> Starting dataset (df)
+# data_subset -> Chosen data subset (df)
+# features -> List of Feature objects ([][])
+# lasso_metrics -> results from lasso (df)
+# lasso_coef -> coefs from lasso (df)
+# lasso_coef_red -> coefs reduced down (df)
+# lzp_metrics -> 
 
 
 # Initializing dataframe and changeable features
@@ -36,14 +28,19 @@ data_subset, features = init_df(data_init)
 
 
 
-
+############################################################################### Subset Creation ###############################################################################
+#
+# Need to add:
+    # Make 'done' case-insensitive
+    # Add reset option
+    # Warning for the dataset becoming too small upon making a choice
+    #   or: give an option to revert choice
+    # If mispelled print "not a viable option, try again"
+    #
 
 inp = input("Welcome Prof. Pendola, press Enter to start\n")
 
-
-############################################################################### Subset Creation ###############################################################################
-
-while(inp != "Done"):
+while(inp != "Done"): 
 
     for i, group in enumerate(features):
         if (i==0):
@@ -76,7 +73,8 @@ while(inp != "Done"):
                     mask = data_subset[name].isin(inp)
                     data_subset = data_subset[mask]
 
-                    print(data_subset[1:400].to_string())
+                    # print(data_subset[1:400].to_string())
+                    display(data_subset)
                     
 
                 else:
@@ -86,108 +84,53 @@ while(inp != "Done"):
 
                     data_subset = data_subset[data_subset[name] >= float(inp)]
 
-                    print(data_subset[1:400].to_string())
+                    # print(data_subset[1:400].to_string())
+                    display(data_subset)
 
                 inp = ""
-                    
+
 ############################################################################### Preprocessing/One-hot ###############################################################################
+#
+# Need to add?:                
+    # Tune lasso parameters proportionally to dataset size***
+    # Prompt user input for what they want to see               
+    # Integrate graphs
+    # Optional choice for user to hard-change params
+    # 
+
+
 
 drop_nom(data_subset)
 mean_sub(data_subset)
 
-lasso_cv_metrics, lasso_cv_coefs = lasso_cv(data_subset)
-lp_metrics = lz_reg(data_subset)
 
-display(lasso_cv_metrics, "\n")
-display(lasso_cv_coefs, "\n")
-display(lp_metrics, "\n")
+lasso_metrics, lasso_coef = models.lasso_cv(data_subset)
+
+subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.001)
+
+
+lzp_metrics = models.lz_reg(data_subset)
+new_models = models.get_models(lzp_metrics)
+
+
+display(data_init, "\n")
+display(data_subset, "\n")
+
+
+display(lasso_metrics, "\n")
+display(lasso_coef, "\n")
+display(coef_red, "\n")
+display(subset_red, "\n")
+
+display(lzp_metrics, "\n")
+display(new_models, "\n")
+
 prt_feat_data(features)
+
+
+
 print("\n")
-
-
-
-# print(data_subset[1:1000].to_string())
-# prt_feat_data(features)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# lasso_cv_metrics, lasso_cv_coefs =  lasso_cv(data_init)
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Modules: gen_table() -> for misc metrics, list data, gen_barhplot() -> lazypredict results, lassocv coefs
-
-
-
-# Prompt user for model choice
-# Lasso, LassoCv, Lazypredict/lazyregressor, Lassocv with range of coefficients selected, lassocv with coefficients removed then run on new models 1 of 3-5
-# graph
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#                
-#
-#
-#
-#
-#
-#
-#
-#                
-#
-#
-#
-#                
-# data_clean = preproc(data_init)
-# df_ut, df_t, df_t_coef = lasso_cv(data_clean)
-# reg_models = lz_reg(data_clean)
-
-
-
-
-
-
-
-
+models.ext_trees(subset_red)
+models.grad_boost(subset_red)
+models.nu_svr(subset_red)
+models.svr(subset_red)
