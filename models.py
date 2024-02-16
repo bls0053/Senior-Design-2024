@@ -14,7 +14,7 @@ from sklearn.preprocessing import normalize
 from sklearn.utils._testing import ignore_warnings
 
 from sklearn.model_selection import cross_val_score, RepeatedKFold
-from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor
+from sklearn.ensemble import ExtraTreesRegressor, HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.svm import NuSVR, SVR
 import lightgbm as ltb
 
@@ -97,6 +97,7 @@ def get_models(df, amount = 3):
     return temp_df
 
 
+
 # Remove in future potentially. Same as reduce_subset but only reduces coefficient dataframe
 
     # def reduce_coef(df, reduc = .05):
@@ -136,7 +137,7 @@ def ext_trees(df):
     y = df['achvz']
 
     # 80/20 test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 64)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 1)
     
     # Scale data
     scaler = StandardScaler()
@@ -162,10 +163,18 @@ def ext_trees(df):
     
 
     # Cross-val
-    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=64)
+    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=None)
     n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 
     print('ExtraTreesRegressor MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
+
+    y_pred = regressor.predict(X_test)
+    
+    y_test = np.array(y_test)
+
+    # act_v_pred = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+
+    return regressor
 
 
 # Simple implementation for HistGradientBoostingRegressor
@@ -194,7 +203,6 @@ def grad_boost(df):
     print('HistGradientBoosting MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
 
 
-# Simple implementation for SVR
 def svr(df):
     # Get target and data
     X = df.drop('achvz', axis=1)
@@ -267,4 +275,48 @@ def nu_svr(df):
     n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 
     print('NuSVR MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores))) 
+
+
+
+
+
+# Takes in single dataframe element (row), model to be used, RETURNS - predicted achvz based off of features
+def pred_achvz(df, mdl):
+    pass
+
+
+
+
+
+# Predictor object for pred_features
+class Predictor:
+    def __init__(self, 
+                 regressor,
+                 coefs,
+                 target,
+                 allowed_error='.1', 
+                 early_exit='100',
+                 ):
+                
+        self.regressor = regressor
+        self.coefs = coefs
+        self.allowed_error = allowed_error
+        self.early_exit = early_exit
+        self.target = target
+
+    def match(self, value):
+
+        if (value <= self.target + self.allowed_error)
+
+
+
+# Takes in single dataframe element (row), model to be used, target achzv, locked variables, acceptable margin of error, RETURNS - predicted features for a target achvz
+def pred_features(df, pred):
+
+    curr_achvz = df.loc[df.index[0]]['achvz']
+    ee_count = 0
+
+    while(pred.match(curr_achvz) == False):
+        pred.
+
 

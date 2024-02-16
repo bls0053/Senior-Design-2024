@@ -37,6 +37,7 @@ num_var = ['perasn','perblk','perwht','perind','perhsp', 'perecd', 'perell']
 def init_df(df):
 
     temp_df = df.copy()
+    # temp_df.set_index('leaid')
 
     # Always drop
         # leaid -> noise, achv -> alternate of predicted metric, Locale3 -> alternate of Locale4, math -> 1 to 1 of achvz, rla -> 1 to 1 of achvz
