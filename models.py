@@ -285,38 +285,30 @@ def pred_achvz(df, mdl):
     pass
 
 
+# Find range based weights for modification of feature prediction
+# Take the coefs from reduced coef
+# Find range of just those from full dataset
+# mutiply it by some arbitrary number
+# mutiply by weights later
 
-
-
-# Predictor object for pred_features
-class Predictor:
-    def __init__(self, 
-                 regressor,
-                 coefs,
-                 target,
-                 allowed_error='.1', 
-                 early_exit='100',
-                 ):
-                
-        self.regressor = regressor
-        self.coefs = coefs
-        self.allowed_error = allowed_error
-        self.early_exit = early_exit
-        self.target = target
-
-    def match(self, value):
-
-        if (value <= self.target + self.allowed_error)
 
 
 
 # Takes in single dataframe element (row), model to be used, target achzv, locked variables, acceptable margin of error, RETURNS - predicted features for a target achvz
 def pred_features(df, pred):
 
+    # Creates variable for starting 'achvz'
     curr_achvz = df.loc[df.index[0]]['achvz']
+    pred.curr_val = curr_achvz
+
+    # Sets initial direction for predictor to go
+    pred.set_pol()
+
+    # Initializes early exit count to 0
     ee_count = 0
 
-    while(pred.match(curr_achvz) == False):
-        pred.
+    while((pred.match(curr_achvz) == False) and (ee_count < pred.early_exit)):
+
+        pred.stretch_feat(df)
 
 

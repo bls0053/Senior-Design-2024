@@ -7,6 +7,7 @@ from IPython.display import display
 
 from clean import init_df, format, prt_feat_data, drop_nom, mean_sub
 import models
+from Predictor import FeaturePredictor
 
 
 
@@ -148,13 +149,72 @@ display(new_models, "\n")
 prt_feat_data(features)
 
 
+
+
+
+
+
+
+
+
+
+
+############################################################################### Reverse Predict ###############################################################################
+
+
+
+
+inp = input("Feature Prediction, press Enter to start\n")
+
+# Placeholder for initializing model used for Predictor
 tree_regressor = models.ext_trees(subset_red)
+pred = FeaturePredictor(regressor=tree_regressor, target=.77)
 
-pred = models.Predictor(model=tree_regressor, target=.66)
 
+# Initializes starting feature weights / value to be changed
+x = subset_red.drop('achvz', axis=1)
+pred.init_weights(coef_red, x)
+
+
+# Placeholder for selcted row to predict
 predicted_row = subset_red.iloc[0:1,0:]
 
-display(predicted_row)
+# Creates variable for starting 'achvz'
+curr_achvz = predicted_row.loc[predicted_row.index[0]]['achvz']
+pred.curr_val = curr_achvz
+
+# Sets initial direction for predictor to go
+pred.set_pol()
+
+# Initializes early exit count to 0
+ee_count = 0
+
+
+
+print(pred.weights)
+
+
+
+
+
+# while((pred.match(curr_achvz) == False) and (ee_count < pred.early_exit)):
+
+#     pred.stretch_feat(predicted_row)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# display(predicted_row)
 
 
 
