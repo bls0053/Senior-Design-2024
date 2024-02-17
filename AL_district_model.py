@@ -177,10 +177,10 @@ pred.init_weights(coef_red, x)
 
 
 # Placeholder for selcted row to predict
-predicted_row = subset_red.iloc[0:1,0:]
+pred_row = subset_red.iloc[0:1,0:]
 
 # Creates variable for starting 'achvz'
-curr_achvz = predicted_row.loc[predicted_row.index[0]]['achvz']
+curr_achvz = pred_row.loc[pred_row.index[0]]['achvz']
 pred.curr_val = curr_achvz
 
 # Sets initial direction for predictor to go
@@ -191,8 +191,12 @@ ee_count = 0
 
 
 
+mod_pred_row = pred.stretch_feat(pred_row)
 
 
+print(pred_row)
+
+print(mod_pred_row)
 
 
 

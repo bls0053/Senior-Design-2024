@@ -72,13 +72,16 @@ class FeaturePredictor:
 
 
 
-
-
-
-
-
-
-
     # Takes in single rowed dataframe, modulates feature values
-    def stretch_feat():
-        pass
+    def stretch_feat(self, df):
+        
+        
+        temp_df = df.copy()
+
+        print(temp_df,"\nIM IN: \n\n\n")
+
+
+        for i, column in enumerate(df.columns):
+
+
+            print(temp_df.iloc[0][i], " ", self.weights[i], "= ", self.weights[i]+temp_df.iloc[0][i])
