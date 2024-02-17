@@ -191,7 +191,6 @@ ee_count = 0
 
 
 
-print(pred.weights)
 
 
 

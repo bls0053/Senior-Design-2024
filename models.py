@@ -64,9 +64,11 @@ def lasso_cv(df):
     feature_names.remove('achvz')
 
     df_t_coef = pd.DataFrame(lasso2.coef_, columns =['Coefficients'], index=feature_names)
-    df_t_coef_sorted = df_t_coef.iloc[np.argsort(np.abs(df_t_coef['Coefficients']))]
     
-    return df_t, df_t_coef_sorted
+        # Reintroduce in seperate sort method
+    # df_t_coef_sorted = df_t_coef.iloc[np.argsort(np.abs(df_t_coef['Coefficients']))]
+
+    return df_t, df_t_coef
 
 
 # Runs lazypredict on user-made dataframe. Returns dataframe populated with model performance results
@@ -166,7 +168,9 @@ def ext_trees(df):
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=None)
     n_scores = cross_val_score(regressor, X, y, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1, error_score='raise')
 
-    print('ExtraTreesRegressor MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
+
+        # Reintroduce later in separate function
+    # print('ExtraTreesRegressor MAE: %.3f (%.3f)' % (np.mean(n_scores), np.std(n_scores)))
 
     y_pred = regressor.predict(X_test)
     

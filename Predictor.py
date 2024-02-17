@@ -1,7 +1,7 @@
 
 
 
-
+import numpy as np
 
 # Predictor object for pred_features
 class FeaturePredictor:
@@ -51,14 +51,19 @@ class FeaturePredictor:
     def init_weights(self, coef, df):
 
         ranges = df.apply(lambda x: x.max() - x.min())
+        self.weights = np.zeros(df.shape[0])
+        
 
-        print(coef)
-
-        print(ranges)
-
-        for i, coefficient in enumerate(coef):
-
-            self.weights[i] = (ranges.iloc[i])*(float(coefficient))*(self.reduction)
+        for i, row in enumerate(coef.index):
+            self.weights[i] = (coef.iloc[i][coef.columns[0]])*(self.polarity)*(ranges.iloc[i])
+            
+            # Remove - for testing only
+            print("Feature:", coef.index[i], "-----> "
+                  "Coef:", coef.iloc[i][coef.columns[0]], 
+                  " X Polarity:", self.polarity, 
+                  " X Range:", ranges[i],
+                  " = Weight:", self.weights[i], "\n")
+            
 
 
     def modify_weights(coef, df):
