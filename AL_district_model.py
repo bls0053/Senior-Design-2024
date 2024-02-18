@@ -186,18 +186,19 @@ pred.curr_val = curr_achvz
 # Sets initial direction for predictor to go
 pred.set_pol()
 
-# Initializes early exit count to 0
-ee_count = 0
+# # Initializes early exit count to 0
+# ee_count = 0
+
+x_row = pred_row.drop('achvz', axis=1)
 
 
 
-mod_pred_row = pred.stretch_feat(pred_row)
+mod_x_row = pred.stretch_feat(x_row.copy())
 
 
-print(pred_row)
 
-print(mod_pred_row)
-
+print(x_row)
+print(mod_x_row)
 
 
 # while((pred.match(curr_achvz) == False) and (ee_count < pred.early_exit)):
