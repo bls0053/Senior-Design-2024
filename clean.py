@@ -1,68 +1,11 @@
-import lazypredict
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from lazypredict.Supervised import LazyClassifier, LazyRegressor
-from sklearn.model_selection import train_test_split
-from IPython.display import display
-import numpy as np
 
-# from sklearn.datasets import fetch_california_housing
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import Lasso
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import normalize
+
+# Imports
+import numpy as np
+from IPython.display import display
 import re
 
 
-##########################################################################################################################################################################
-
-def preproc(df):
-
-    # Remove unecessary/gappy and categorical data (columns)
-    drop_cols = [
-        'leaid',
-        'leanm',
-        'achv',
-        'CT_EconType',
-        'DIST_FACTORS',
-        'COUNTY_FACTORS',
-        'HEALTH_FACTORS',
-        'H_FCTR_ZS',
-        'LOCALE_VARS',
-        'Locale4',
-        'Locale3',
-        'math',
-        'rla'
-    ]
-    df.drop(columns=drop_cols, inplace=True)
-
-    # Remove gappy rows / Make tool in future to find gaps
-    drop_rows = [
-        688, 724, 726, 3422, 3874, 4243, 4244, 4249, 4250, 4256, 4257, 4261, 4262, 4618
-    ]
-    df.drop(index=drop_rows, inplace=True)
-
-    # Remove gappy rows in range
-    mask = (df.index < 4781) | (df.index > 4788)
-    df = df[mask]
-
-    mask = (df.index < 4662) | (df.index > 4729)
-    df = df[mask]
-
-    mask = (df.index < 490) | (df.index > 553)
-    df = df[mask]
-    
-    # Replace missing values with mean
-    for column in df.columns:
-
-        if df[column].isnull().any():
-             
-             mean = df[column].mean()
-             df[column].fillna(mean, inplace=True)
-
-    return df
 
 ############################################################################### Dataframe Init ###############################################################################
 
@@ -81,6 +24,8 @@ class Feature_n:
 
 # Categorical variables
 cat_var = ['grade', 'year', 'leanm', 'Locale4', 'BlackBeltSm', 'FoodDesert', 'CT_EconType']
+
+# Nominal variables
 cat_str = ['leanm','Locale4','CT_EconType']
 
 # Numerical variables, cannot select for more than 100% in subset
@@ -88,13 +33,14 @@ num_var = ['perasn','perblk','perwht','perind','perhsp', 'perecd', 'perell']
 
 
 # Initializes changeable features for subset creation
-# Refactor - make single loop, reduce redundancy
+    # Refactor - make single loop, reduce redundancy
 def init_df(df):
 
     temp_df = df.copy()
+    # temp_df.set_index('leaid')
 
     # Always drop
-    # leaid - noise, achv - alternate predicted metric, Locale3 - alternate Locale4, math - 1 to 1 -> achvz, rla - 1 to 1 -> achvz
+        # leaid -> noise, achv -> alternate of predicted metric, Locale3 -> alternate of Locale4, math -> 1 to 1 of achvz, rla -> 1 to 1 of achvz
     drop_cols = [
         'leaid', 
         'achv', 
@@ -178,7 +124,7 @@ def drop_nom(df):
         if df[column].astype(str).str.contains(r'[0-9.-]', regex=True).any():
             pass
         else:
-            pass
+            df.drop(columns=column, inplace=True)
 
 
 # Fill nan values
@@ -206,6 +152,10 @@ def prt_feat_data(features):
 
 
 
+
+
+
+# Misc Notes
 
 
 # priorities when coming back, refactor pre-processing method - fill missing values: ALL? or minor?
