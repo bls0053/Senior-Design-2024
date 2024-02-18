@@ -8,8 +8,10 @@ from IPython.display import display
 from clean import init_df, format, prt_feat_data, drop_nom, mean_sub
 import models
 from Predictor import FeaturePredictor
+import numpy as np
 
-
+from tqdm import tqdm
+import time
 
 
 ##################################################################################################################
@@ -166,8 +168,11 @@ prt_feat_data(features)
 
 inp = input("Feature Prediction, press Enter to start\n")
 
+
+mod = models.ext_trees(subset_red)
+
 # Placeholder for initializing model used for Predictor
-tree_regressor = models.ext_trees(subset_red)
+tree_regressor = mod
 pred = FeaturePredictor(regressor=tree_regressor, target=.77)
 
 
@@ -199,6 +204,37 @@ mod_x_row = pred.stretch_feat(x_row.copy())
 
 print(x_row)
 print(mod_x_row)
+
+
+all = []
+num_iterations = 100
+
+for i in tqdm(range(num_iterations), desc="Processing", unit="iteration"):
+    prediction = mod.predict(x_row)
+    all.append(prediction)
+
+mean_predictions = np.mean(all, axis=0)
+
+print(mean_predictions)
+
+
+
+
+
+
+all = []
+
+for i in range(100):
+    prediction = mod.predict(mod_x_row)
+    all.append(prediction)
+
+mean_predictions = np.mean(all, axis=0)
+
+print(mean_predictions)
+
+
+
+
 
 
 # while((pred.match(curr_achvz) == False) and (ee_count < pred.early_exit)):
