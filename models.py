@@ -45,7 +45,7 @@ def lasso_cv(df):
 
     # Lasso cross validation w/ tuning 
     param_grid = {
-        'alpha' : [0.01, 0.1, 1, 10, 100],
+        'alpha' : [0.00001, 0.0001, 0.001, 0.01],
         'tol' : [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]
     }
     lasso_cv = GridSearchCV(lasso, param_grid, cv = 5, n_jobs = -1)
@@ -116,7 +116,7 @@ def get_models(df, amount = 3):
 
 
 # Reduces subset and coefficients based on specified amount of regularization of coefficients
-def reduce_subset(df_sub, df_coef, reduc = .05):
+def reduce_subset(df_sub, df_coef, reduc = .2):
 
     temp_sub = df_sub.copy()
     temp_coef = df_coef.copy()
@@ -137,6 +137,7 @@ def ext_trees(df):
     # Get target and data
     X = df.drop('achvz', axis=1)
     y = df['achvz']
+    normalize(X)
 
     # 80/20 test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 1)

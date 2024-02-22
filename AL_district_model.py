@@ -129,7 +129,7 @@ mean_sub(data_subset)
 
 lasso_metrics, lasso_coef = models.lasso_cv(data_subset)
 
-subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.01)
+subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.1)
 
 
 lzp_metrics = models.lz_reg(data_subset)
@@ -161,7 +161,7 @@ prt_feat_data(features)
 
 
 
-############################################################################### Reverse Predict ###############################################################################
+############################################################################### Achvz Predict - WIP ###############################################################################
 
 
 
@@ -169,11 +169,13 @@ prt_feat_data(features)
 inp = input("Feature Prediction, press Enter to start\n")
 
 
+print(coef_red)
+print(subset_red)
 mod = models.ext_trees(subset_red)
 
 # Placeholder for initializing model used for Predictor
 tree_regressor = mod
-pred = FeaturePredictor(regressor=tree_regressor, target=.77)
+pred = FeaturePredictor(regressor=tree_regressor, target=.95)
 
 
 # Initializes starting feature weights / value to be changed

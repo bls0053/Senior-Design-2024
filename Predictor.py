@@ -56,7 +56,7 @@ class FeaturePredictor:
         
 
         for i, row in enumerate(coef.index):
-            self.weights[i] = (coef.iloc[i][coef.columns[0]])*(self.polarity)*(ranges.iloc[i])
+            self.weights[i] = (coef.iloc[i][coef.columns[0]])*(self.polarity)*(ranges.iloc[i])*self.reduction
             
             # Remove - for testing only
             print("Feature:", coef.index[i], "-----> "
@@ -90,3 +90,8 @@ class FeaturePredictor:
             df[column] = df[column].replace(df.loc[df.index[0]][column], str(sum))
 
         return df
+
+
+
+    def pred():
+        pass
