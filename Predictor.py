@@ -7,7 +7,7 @@ import pandas as pd
 # Predictor object for pred_features
 class FeaturePredictor:
 
-    reduction = 1
+    reduction = .1
 
     def __init__(self,
                  regressor,
@@ -16,8 +16,8 @@ class FeaturePredictor:
                  curr_val = 0,
                  weights = [],
                  lock = [],
-                 allowed_error='.1', 
-                 early_exit='100',
+                 allowed_error=.1, 
+                 early_exit=100,
                  ):
 
         self.weights = weights
@@ -78,14 +78,10 @@ class FeaturePredictor:
 
         for i, column in enumerate(df.columns):
 
-            # print(column)
-            # print(df.index[0])
-            # print(df.loc[df.index[0]][column])
+            # print(df.iloc[0][i])
+            # print(self.weights[i])
 
-            sum = df.iloc[0][i] + self.weights[i]
-
-            print(sum)
-
+            sum = float(df.iloc[0][i]) + self.weights[i]
 
             df[column] = df[column].replace(df.loc[df.index[0]][column], str(sum))
 

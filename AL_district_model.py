@@ -166,7 +166,7 @@ prt_feat_data(features)
 
 
 
-inp = input("Feature Prediction, press Enter to start\n")
+# inp = input("Feature Prediction, press Enter to start\n")
 
 
 print(coef_red)
@@ -177,11 +177,9 @@ mod = models.ext_trees(subset_red)
 tree_regressor = mod
 pred = FeaturePredictor(regressor=tree_regressor, target=.95)
 
-
 # Initializes starting feature weights / value to be changed
 x = subset_red.drop('achvz', axis=1)
 pred.init_weights(coef_red, x)
-
 
 # Placeholder for selcted row to predict
 pred_row = subset_red.iloc[0:1,0:]
@@ -190,65 +188,42 @@ pred_row = subset_red.iloc[0:1,0:]
 curr_achvz = pred_row.loc[pred_row.index[0]]['achvz']
 pred.curr_val = curr_achvz
 
-# Sets initial direction for predictor to go
-pred.set_pol()
+# Initializes early exit count to 0
+ee_count = 0
 
-# # Initializes early exit count to 0
-# ee_count = 0
-
+# Original row
 x_row = pred_row.drop('achvz', axis=1)
 
-
-
-mod_x_row = pred.stretch_feat(x_row.copy())
-
-
-
-print(x_row)
-print(mod_x_row)
+# Modified row
+mod_x_row = x_row.copy()
 
 
 all = []
 num_iterations = 100
 
-for i in tqdm(range(num_iterations), desc="Processing", unit="iteration"):
-    prediction = mod.predict(x_row)
-    all.append(prediction)
+while((pred.match() == False) and (ee_count < pred.early_exit)):
 
-mean_predictions = np.mean(all, axis=0)
+    # Set pol and stretch features
+    pred.set_pol()
+    mod_x_row = pred.stretch_feat(mod_x_row)
 
-print(mean_predictions)
+    # Predict modified achvz
+    for i in tqdm(range(num_iterations), desc="Processing", unit="iteration"):
+        prediction = mod.predict(mod_x_row)
+        all.append(prediction)
+    mean_predictions = np.mean(all, axis=0)
 
+    # Set new achvz progress
+    pred.curr_val = mean_predictions
 
+    # Iterate early exit count
+    ee_count += 1
 
-
-
-
-all = []
-
-for i in range(100):
-    prediction = mod.predict(mod_x_row)
-    all.append(prediction)
-
-mean_predictions = np.mean(all, axis=0)
-
-print(mean_predictions)
-
-
-
-
-
-
-# while((pred.match(curr_achvz) == False) and (ee_count < pred.early_exit)):
-
-#     pred.stretch_feat(predicted_row)
-
-
-
-
-
-
-
+    print("polarity = ", pred.polarity)
+    print("trial # = ", ee_count, " / ", pred.early_exit)
+    print("Modified row = ", mod_x_row)
+    print("Achvz = ", pred.curr_val, " / ", pred.target, "\n")
+    
 
 
 
