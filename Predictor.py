@@ -7,7 +7,7 @@ import pandas as pd
 # Predictor object for pred_features
 class FeaturePredictor:
 
-    reduction = .8
+    reduction = .1
 
     def __init__(self,
                  regressor,
@@ -17,7 +17,7 @@ class FeaturePredictor:
                  weights = [],
                  lock = [],
                  allowed_error=.001, 
-                 early_exit=100,
+                 early_exit=500,
                  ):
 
         self.weights = weights
