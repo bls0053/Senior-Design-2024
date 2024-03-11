@@ -166,7 +166,7 @@ prt_feat_data(features)
 
 
 
-# inp = input("Feature Prediction, press Enter to start\n")
+inp = input("Feature Prediction, press Enter to start\n")
 
 
 print(coef_red)
@@ -204,7 +204,6 @@ num_iterations = 100
 while((pred.match() == False) and (ee_count < pred.early_exit)):
 
     # Set pol and stretch features
-    pred.set_pol()
     mod_x_row = pred.stretch_feat(mod_x_row)
 
     # Predict modified achvz
@@ -215,13 +214,15 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
 
     # Set new achvz progress
     pred.curr_val = mean_predictions
-
+    pred.set_pol()
+    
     # Iterate early exit count
     ee_count += 1
 
     print("polarity = ", pred.polarity)
     print("trial # = ", ee_count, " / ", pred.early_exit)
     print("Modified row = ", mod_x_row)
+    print("Weights = ", pred.weights)
     print("Achvz = ", pred.curr_val, " / ", pred.target, "\n")
     
 
