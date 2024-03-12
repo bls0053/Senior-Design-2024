@@ -204,7 +204,7 @@ pred.init_lock(mod_x_row)
 inp = input("Modify features to be locked:\n")
 
 while(inp != "Done"):
-
+                   
     print(pred.lock)
     inp = input("Specify number(s) to be locked. Ex. 3,4,7,1...\n",
                 "Type 'Done' to continue\n")
