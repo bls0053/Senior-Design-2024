@@ -7,7 +7,7 @@ import pandas as pd
 # Predictor object for pred_features
 class FeaturePredictor:
 
-    reduction = .2
+    reduction = .8
 
     def __init__(self,
                  regressor,
@@ -15,8 +15,8 @@ class FeaturePredictor:
                  polarity = 1,
                  curr_val = 0,
                  lock = pd.DataFrame(),
-                 allowed_error=.01, 
-                 early_exit=500,
+                 allowed_error=.005, 
+                 early_exit=100,
                  ):
 
         self.curr_val = curr_val
