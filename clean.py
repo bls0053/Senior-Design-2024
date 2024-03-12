@@ -88,13 +88,13 @@ def init_df(df):
 def format(str):
     str = str.split(',')
     formatted_array = []
-
+    
     for i in str:
         if re.search(r'\d', i):
-            formatted_element = int(i)
+            formatted_element = int(i.strip())
         else:    
             formatted_element = i.lower().strip()
-        formatted_array.append(formatted_element)    
+        formatted_array.append(formatted_element)
 
     return formatted_array
 

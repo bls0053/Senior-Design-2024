@@ -7,7 +7,7 @@ import pandas as pd
 # Predictor object for pred_features
 class FeaturePredictor:
 
-    reduction = .5
+    reduction = .2
 
     def __init__(self,
                  regressor,
@@ -52,34 +52,21 @@ class FeaturePredictor:
             max = df[df.columns[i]].max()
             range = max-min
 
-            # Calculates weight
             self.lock.iloc[0][i] = float((coef.iloc[i][coef.columns[0]])*(range)*self.reduction)
             self.lock.iloc[1][i] = min
             self.lock.iloc[2][i] = max
-
-
-            # Fills locking mechanism
-
-
-        print(self.lock)
-
-
-            
-            # Remove - for testing only
-            # print("Feature:", coef.index[i], "-----> "
-            #       "Coef:", coef.iloc[i][coef.columns[0]], 
-            #       " X Polarity:", self.polarity, 
-            #       " X Range:", ranges[i],
-            #       " = Weight:", self.weights[i], "\n")
             
 
     # Takes in single rowed dataframe, modulates feature values
     def stretch_feat(self, df):
 
         for i, column in enumerate(df.columns):
-            print(self.lock.iloc[0][i])
-            sum = float(df.iloc[0][i]) + self.lock.iloc[0][i]
-            df[column] = df[column].replace(df.loc[df.index[0]][column], sum)
+
+            if (self.lock.loc["Lock"][column]) == 0:
+                continue
+            else:
+                sum = float(df.iloc[0][i]) + self.lock.iloc[0][i]
+                df[column] = df[column].replace(df.loc[df.index[0]][column], sum)
 
         return df
 

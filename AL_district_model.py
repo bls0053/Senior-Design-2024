@@ -201,8 +201,12 @@ mod_x_row = x_row.copy()
 
 ############################################################################### Change Lock ###############################################################################
 
+print(pred.lock, "\n")
+inp = format(input("Modify Locks: "))
 
-
+for i in inp:
+    pred.lock.iloc[3][int(i)] = 0
+inp = input()
 ###########################################################################################################################################################################
 
 
@@ -215,7 +219,7 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
     mod_x_row = pred.stretch_feat(mod_x_row)
 
     # Predict modified achvz
-    for i in tqdm(range(num_iterations), desc="Processing", unit="iteration"):
+    for i in tqdm(range(num_iterations), desc="Chuggin:", unit="iteration"):
         prediction = mod.predict(mod_x_row)
         all.append(prediction)
     mean_predictions = np.mean(all, axis=0)
@@ -233,9 +237,6 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
     print("Weights = \n", pred.lock)
     print("Achvz = ", pred.curr_val, " / ", pred.target, "\n")
     
-
-
-
 
 
 
