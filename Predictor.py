@@ -15,7 +15,7 @@ class FeaturePredictor:
                  polarity = 1,
                  curr_val = 0,
                  lock = pd.DataFrame(),
-                 allowed_error=.001, 
+                 allowed_error=.01, 
                  early_exit=500,
                  ):
 
