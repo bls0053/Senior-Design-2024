@@ -132,8 +132,8 @@ lasso_metrics, lasso_coef = models.lasso_cv(data_subset)
 subset_red, coef_red = models.reduce_subset(data_subset, lasso_coef, 0.1)
 
 
-lzp_metrics = models.lz_reg(data_subset)
-new_models = models.get_models(lzp_metrics)
+# lzp_metrics = models.lz_reg(data_subset)
+# new_models = models.get_models(lzp_metrics)
 
 
 display(data_init, "\n")
@@ -145,8 +145,8 @@ display(lasso_coef, "\n")
 display(coef_red, "\n")
 display(subset_red, "\n")
 
-display(lzp_metrics, "\n")
-display(new_models, "\n")
+# display(lzp_metrics, "\n")
+# display(new_models, "\n")
 
 prt_feat_data(features)
 
@@ -196,6 +196,27 @@ x_row = pred_row.drop('achvz', axis=1)
 
 # Modified row
 mod_x_row = x_row.copy()
+pred.init_lock(mod_x_row)
+
+
+############################################################################### Change Lock ###############################################################################
+
+inp = input("Modify features to be locked:\n")
+
+while(inp != "Done"):
+
+    print(pred.lock)
+    inp = input("Specify number(s) to be locked. Ex. 3,4,7,1...\n",
+                "Type 'Done' to continue\n")
+
+    if (inp == "Done"):
+        continue
+    else:
+        pred.modify_lock(inp)
+
+
+
+###########################################################################################################################################################################
 
 
 all = []
@@ -232,19 +253,6 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
 
 
 
-# display(predicted_row)
-
-
-
-
-# models.pred_features(subset_red, pred)
-
-
-
-
-# prompt for completion
-# "Done"
-# 
 
 
 
@@ -257,6 +265,21 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
 
 
 
+# Todo
+    # Implement Lock
+    # Change reduction
+
+    # Establish bounds
+    # Collect differences in row
+    
+    # Graph 
+    # 
+    # 
+    # 
+    # 
+    # 
+    # 
+    # 
 
 
 
@@ -265,42 +288,3 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
 
 
 
-# print("\n")
-# models.ext_trees(subset_red)
-# models.grad_boost(subset_red)
-# models.nu_svr(subset_red)
-# models.svr(subset_red)
-
-
-
-
-
-
-# DF indexing reminder
-# Take slice df.iloc[1:2,0:34]
-# row indexing, column name indexing -> df.iloc[1]['abcd'] #### WRONG
-# loc - label based
-# iloc - integer
-# 
-# 
-# 
-# 
-
-
-
-
-
-
-
-
-
-
-
-
-# End up with a tuned model specific to the subset defined
-# User defines valid level of student performance
-# User defines coefs to not be changed
-# Model estimates necessary change to coefficients to match target
-# If we can get multiple options thatd be sick
-# 
-#

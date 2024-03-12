@@ -7,7 +7,7 @@ import pandas as pd
 # Predictor object for pred_features
 class FeaturePredictor:
 
-    reduction = .1
+    reduction = .5
 
     def __init__(self,
                  regressor,
@@ -15,7 +15,7 @@ class FeaturePredictor:
                  polarity = 1,
                  curr_val = 0,
                  weights = [],
-                 lock = [],
+                 lock = pd.DataFrame(),
                  allowed_error=.001, 
                  early_exit=500,
                  ):
@@ -78,7 +78,27 @@ class FeaturePredictor:
         
         for i, weight in enumerate(self.weights):
             self.weights[i] = weight * -1  
+
+
+    def init_lock(self, df):
+
+        x = len(df.columns) + 1
+        self.lock = pd.DataFrame(columns = np.arange(1, x, dtype = int))
         
+        features = list(df.columns)
+        self.lock.loc[0] = features
+
+    # Check valid ranges, change flags 1->0 if outside range
+    def modify_lock(self, inp):
+        pass
+
+    
+    
+
+
+
+
+
     # # Flags whether the current value needs to increase or decrease, 1 -> target is higher, -1 -> target is lower        
     # def set_pol(self):
 
