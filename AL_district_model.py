@@ -196,23 +196,10 @@ x_row = pred_row.drop('achvz', axis=1)
 
 # Modified row
 mod_x_row = x_row.copy()
-pred.init_lock(mod_x_row)
+# pred.init_lock(mod_x_row)
 
 
 ############################################################################### Change Lock ###############################################################################
-
-inp = input("Modify features to be locked:\n")
-
-while(inp != "Done"):
-                   
-    print(pred.lock)
-    inp = input("Specify number(s) to be locked. Ex. 3,4,7,1...\n",
-                "Type 'Done' to continue\n")
-
-    if (inp == "Done"):
-        continue
-    else:
-        pred.modify_lock(inp)
 
 
 
@@ -242,8 +229,8 @@ while((pred.match() == False) and (ee_count < pred.early_exit)):
 
     print("polarity = ", pred.polarity)
     print("trial # = ", ee_count, " / ", pred.early_exit)
-    print("Modified row = ", mod_x_row)
-    print("Weights = ", pred.weights)
+    print("Modified row = \n", mod_x_row)
+    print("Weights = \n", pred.lock)
     print("Achvz = ", pred.curr_val, " / ", pred.target, "\n")
     
 

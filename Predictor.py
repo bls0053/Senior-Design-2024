@@ -14,13 +14,11 @@ class FeaturePredictor:
                  target,
                  polarity = 1,
                  curr_val = 0,
-                 weights = [],
                  lock = pd.DataFrame(),
                  allowed_error=.001, 
                  early_exit=500,
                  ):
 
-        self.weights = weights
         self.curr_val = curr_val
         self.polarity = polarity
         self.regressor = regressor
@@ -44,9 +42,28 @@ class FeaturePredictor:
 
         ranges = df.apply(lambda x: x.max() - x.min())
         self.weights = np.zeros(df.shape[0])
+
+        self.lock = pd.DataFrame(columns= df.columns, index= ["Weight", "Min", "Max", "Lock"])
+        self.lock.loc["Lock"] = 1
         
         for i, row in enumerate(coef.index):
-            self.weights[i] = (coef.iloc[i][coef.columns[0]])*(self.polarity)*(ranges.iloc[i])*self.reduction
+
+            min = df[df.columns[i]].min()
+            max = df[df.columns[i]].max()
+            range = max-min
+
+            # Calculates weight
+            self.lock.iloc[0][i] = float((coef.iloc[i][coef.columns[0]])*(range)*self.reduction)
+            self.lock.iloc[1][i] = min
+            self.lock.iloc[2][i] = max
+
+
+            # Fills locking mechanism
+
+
+        print(self.lock)
+
+
             
             # Remove - for testing only
             # print("Feature:", coef.index[i], "-----> "
@@ -60,12 +77,13 @@ class FeaturePredictor:
     def stretch_feat(self, df):
 
         for i, column in enumerate(df.columns):
-
-            sum = float(df.iloc[0][i]) + self.weights[i]
-            df[column] = df[column].replace(df.loc[df.index[0]][column], str(sum))
+            print(self.lock.iloc[0][i])
+            sum = float(df.iloc[0][i]) + self.lock.iloc[0][i]
+            df[column] = df[column].replace(df.loc[df.index[0]][column], sum)
 
         return df
 
+    # Flips weight values if overshoot target
     def set_pol(self):
         if (self.curr_val < self.target and self.polarity == -1 or 
             self.curr_val > self.target and self.polarity == 1):
@@ -74,19 +92,16 @@ class FeaturePredictor:
             self.modify_weights()
 
 
+
+    # Flips weights
     def modify_weights(self):
-        
-        for i, weight in enumerate(self.weights):
-            self.weights[i] = weight * -1  
+        for i, weight in enumerate(self.lock.loc["Weight"]):
+            self.lock.iloc[0][i] = weight * -1  
+
 
 
     def init_lock(self, df):
-
-        x = len(df.columns) + 1
-        self.lock = pd.DataFrame(columns = np.arange(1, x, dtype = int))
-        
-        features = list(df.columns)
-        self.lock.loc[0] = features
+        pass
 
     # Check valid ranges, change flags 1->0 if outside range
     def modify_lock(self, inp):
